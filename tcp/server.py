@@ -7,14 +7,23 @@ def start_server(host: str, port: int):
 
     print(f"- Server is running at [{host}:{port}]...")
 
-    client_socket, client_addr = server.accept()
-    print(f"- Established connection at address: {client_addr}.")
-
     while True:
-        data = client_socket.recv(1024).decode()
-        print(f"[CLIENT]: {data}")
+        client_socket, client_addr = server.accept()
+        print(f"- Established connection at address: {client_addr}.")
 
-        client_socket.sendall("pong".encode())
+        while True:
+            try:
+                data = client_socket.recv(1024)
+
+                if not data:
+                    print(f"Client [{host}:{port}] disconnected.")
+                    break
+
+                print(f"[CLIENT]: {data.decode()}")
+                client_socket.sendall("Message received".encode())
+            except ConnectionResetError:
+                print("Connection ended abruptaly")
+                break
 
 if __name__ == "__main__":
     HOST = "localhost"
